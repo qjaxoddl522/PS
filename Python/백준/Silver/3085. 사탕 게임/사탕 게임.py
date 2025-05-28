@@ -1,46 +1,36 @@
-import copy
-
-B = int(input())
-board = [list(input().strip()) for _ in range(B)]
-
-def bubble_sort(K):
-    original = copy.deepcopy(K)
-    total = 1
-    n = len(K)
-    
+def check(b):
+    res = 0
     for i in range(n):
-        for j in range(n-1):
-            if K[i][j] != K[i][j+1]:
-                K[i][j], K[i][j+1] = K[i][j+1], K[i][j]
-                total = max(total, solve_board(K))
-                K[:] = copy.deepcopy(original)[:]
-    
-    for j in range(n):
-        for i in range(n-1):
-            if K[i][j] != K[i+1][j]:
-                K[i][j], K[i+1][j] = K[i+1][j], K[i][j]
-                total = max(total, solve_board(K))
-                K[:] = copy.deepcopy(original)[:]
-    return total
-
-def solve_board(K):
-    RVS = list(map(list, zip(*K)))
-    return max(check(K, B), check(RVS, B))
-
-#연속된 걸 찾는 함수
-def check(K, n):
-    max_len = 0
-    for i in range(n):
-        cnt = 1  # 각 행마다 초기화
-        for j in range(1, n):
-            if K[i][j] == K[i][j-1]:
+        cnt = 1
+        for j in range(n-1): #행 검사
+            if b[i][j] == b[i][j+1]:
                 cnt += 1
+                res = max(res, cnt)
             else:
-                max_len = max(max_len, cnt)
                 cnt = 1
-        max_len = max(max_len, cnt)  # 행의 끝에서의 연속 길이 체크
-    return max_len
 
-res = bubble_sort(board)
+        cnt = 1
+        for j in range(n-1): #열 검사
+            if b[j][i] == b[j+1][i]:
+                cnt += 1
+                res = max(res, cnt)
+            else:
+                cnt = 1
+    return res
 
-print(res)
+n = int(input())
+board = [list(input()) for _ in range(n)]
+result = 0
+
+for i in range(n):
+    for j in range(n):
+        if j+1 < n: #행이 끝부분인지 확인
+            board[i][j], board[i][j+1] = board[i][j+1], board[i][j]
+            result = max(result, check(board))
+            board[i][j], board[i][j+1] = board[i][j+1], board[i][j] #계산 후 원래대로
+        if i+1 < n: #열이 끝부분인지 확인
+            board[i][j], board[i+1][j] = board[i+1][j], board[i][j]
+            result = max(result, check(board))
+            board[i][j], board[i+1][j] = board[i+1][j], board[i][j] #계산 후 원래대로
+
+print(result)
