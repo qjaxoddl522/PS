@@ -22,19 +22,20 @@ def main():
 			else:
 				tree[i] = tree[i*2+1]
 
-	def query(start, end):
-		def find(idx, s, e):
-			if s > end or e < start:
-				return (INF, -1, -1)
-			if start <= s and e <= end:
-				return tree[idx]
-			mid = (s + e) // 2
-			left = find(idx*2, s, mid)
-			right = find(idx*2+1, mid+1, e)
-			if left[0] < right[0]:
-				return left
-			return right
-		return find(1, 0, leafL-1)
+	def query(l, r):
+		l += leafL;  r += leafL
+		minRes = (INF, -1, -1)
+		while l <= r:
+			if l & 1:
+				if tree[l][0] < minRes[0]:
+					minRes = tree[l]
+				l += 1
+			if not r & 1:
+				if tree[r][0] < minRes[0]:
+					minRes = tree[r]
+				r -= 1
+			l //= 2;  r //= 2
+		return minRes
 
 	for _ in range(int(input())):
 		N, a, b = map(int, input().split())
@@ -54,10 +55,12 @@ def main():
 				tree[i] = tree[i*2+1]
 		
 		q = deque()
-		for i in range(N):
-			if blocks[i][1] <= b:
-				q.append(i)
-				update(i, (INF, -1, -1))
+		while True:
+			minY, _, nextIdx = query(0, N-1)
+			if minY > b: break
+			q.append(nextIdx)
+			update(nextIdx, (INF, -1, -1))
+		
 		while q:
 			idx = q.popleft()
 			block = blocks[idx]
@@ -69,11 +72,10 @@ def main():
 			end = bisect_right(blocks, (block[0] + a, INF)) - 1
 			while True:
 				minY, _, nextIdx = query(start, end)
-				if block[1] + b >= minY:
-					q.append(nextIdx)
-					update(nextIdx, (INF, -1, -1))
-				else:
+				if block[1] + b < minY:
 					break
+				q.append(nextIdx)
+				update(nextIdx, (INF, -1, -1))
 		else:
 			print("NO")
 
