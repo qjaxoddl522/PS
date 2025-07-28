@@ -1,27 +1,30 @@
 import sys
 input = lambda: sys.stdin.readline().rstrip()
 
-def main():
-	def rec(a, b, c):
-		if a <= 0 or b <= 0 or c <= 0:
-			return 1
-		if a > 20 or b > 20 or c > 20:
-			return rec(20, 20, 20)
-		if (a, b, c) in dp:
-			return dp[(a, b, c)]
-		
-		if a < b < c:
-			dp[(a, b, c)] = rec(a, b, c-1) + rec(a, b-1, c-1) - rec(a, b-1, c)
-		else:
-			dp[(a, b, c)] = rec(a-1, b, c) + rec(a-1, b-1, c) + rec(a-1, b, c-1) - rec(a-1, b-1, c-1)
-		return dp[(a, b, c)]
+MAX = 20
+SIZE = MAX + 1
 
-	while True:
-		a, b, c = map(int, input().split())
-		if a == -1 and b == -1 and c == -1:
-			break
+dp = [[[0]*SIZE for _ in range(SIZE)] for __ in range(SIZE)]
+for a in range(SIZE):
+    for b in range(SIZE):
+        for c in range(SIZE):
+            if a == 0 or b == 0 or c == 0:
+                dp[a][b][c] = 1
+            elif a < b < c:
+                dp[a][b][c] = (dp[a][b][c-1] + dp[a][b-1][c-1] - dp[a][b-1][c])
+            else:
+                dp[a][b][c] = (dp[a-1][b][c] +dp[a-1][b-1][c] +dp[a-1][b][c-1] -dp[a-1][b-1][c-1])
 
-		dp = dict()
-		print(f"w({a}, {b}, {c}) = {rec(a, b, c)}")
+while True:
+    a, b, c = map(int, input().split())
+    if a == -1 and b == -1 and c == -1:
+        break
 
-main()
+    if a <= 0 or b <= 0 or c <= 0:
+        ans = 1
+    elif a > MAX or b > MAX or c > MAX:
+        ans = dp[MAX][MAX][MAX]
+    else:
+        ans = dp[a][b][c]
+
+    print(f"w({a}, {b}, {c}) = {ans}")
